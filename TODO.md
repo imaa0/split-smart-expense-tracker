@@ -1,3 +1,0 @@
-- [x] Add smooth scrolling CSS to src/index.css
-- [x] Add IDs to sections in src/components/SplitSmartLanding.jsx (home, features, how-it-works, contact)
-- [x] Update navigation links in src/components/SplitSmartLanding.jsx to use #id hrefs
