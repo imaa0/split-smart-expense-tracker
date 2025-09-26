@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, X } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../contexts/useAuth'
 
 const LoginPage = () => {
   const navigate = useNavigate()
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('user')
   const [showPassword, setShowPassword] = useState(false)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
@@ -23,6 +24,12 @@ const LoginPage = () => {
     const result = await login(email, password)
 
     if (result.success) {
+      // Check if the user's role matches the selected role
+      if (result.user.role !== role) {
+        setError(`Invalid role. You are logged in as ${result.user.role}, but selected ${role}.`)
+        setLoading(false)
+        return
+      }
       navigate('/dashboard')
     } else {
       setError(result.message)
@@ -104,6 +111,35 @@ const LoginPage = () => {
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Role Selection */}
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-3">Select your role:</p>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={() => setRole('user')}
+                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors duration-200 ${
+                  role === 'user'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                User
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('manager')}
+                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors duration-200 ${
+                  role === 'manager'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Manager
+              </button>
+            </div>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Email Input */}
             <div className="relative">
@@ -210,6 +246,8 @@ const LoginPage = () => {
               Continue with Facebook
             </button>
           </div>
+
+          
 
           {/* Register Link */}
           <div className="mt-8 text-center">

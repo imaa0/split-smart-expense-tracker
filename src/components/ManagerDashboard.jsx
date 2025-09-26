@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import React, { useState } from 'react'
 import {
   LayoutDashboard,
   Users,
@@ -15,22 +14,13 @@ import {
   Ticket,
   UserPlus,
   Menu,
-  X,
-  Loader2
+  X
 } from 'lucide-react'
 
-import { useAuth } from '../contexts/useAuth'
 import CreateGroupModal from './CreateGroupModal'
 
-const Dashboard = () => {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (user?.role === 'manager' || user?.role === 'admin') {
-      navigate('/manager/dashboard')
-    }
-  }, [user, navigate])
+const ManagerDashboard = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const stats = [
     {
@@ -65,21 +55,27 @@ const Dashboard = () => {
 
   const groups = [
     {
+      id: 1,
       name: "Family Trip",
+      description: "Vacation expenses with family",
       members: 4,
       balance: 50.00,
       status: "owed",
       progress: 75
     },
     {
+      id: 2,
       name: "Office Lunch",
+      description: "Weekly team lunches",
       members: 3,
       balance: 25.50,
       status: "owe",
       progress: 30
     },
     {
+      id: 3,
       name: "Weekend Getaway",
+      description: "Friends weekend trip",
       members: 5,
       balance: 0,
       status: "settled",
@@ -88,6 +84,7 @@ const Dashboard = () => {
   ]
 
   const [showModal, setShowModal] = useState(false)
+  const [editGroup, setEditGroup] = useState(null)
 
   const activities = [
     {
@@ -116,10 +113,6 @@ const Dashboard = () => {
     }
   ]
 
-  if (user?.role === 'manager' || user?.role === 'admin') {
-    return null // Redirect handled in useEffect
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
@@ -134,7 +127,7 @@ const Dashboard = () => {
                 </div>
                 <span className="text-xl font-bold text-gray-800">SplitSmart</span>
               </div>
-              
+
               {/* Main Navigation */}
               <div className="hidden md:flex items-center space-x-8 ml-10">
                 <a href="#" className="text-blue-600 font-medium">Dashboard</a>
@@ -149,12 +142,12 @@ const Dashboard = () => {
                 <Bell className="h-5 w-5" />
               </button>
               <div className="flex items-center space-x-2">
-                <img 
-                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face&facepad=2&bg=white" 
-                  alt="Jane Doe" 
+                <img
+                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face&facepad=2&bg=white"
+                  alt="Jane Doe"
                   className="w-8 h-8 rounded-full"
                 />
-                <span className="text-sm font-medium text-gray-700">Jane Doe</span>
+                <span className="text-sm font-medium text-gray-700">Jane Doe (Manager)</span>
                 <ChevronDown className="h-4 w-4 text-gray-500" />
               </div>
             </div>
@@ -164,28 +157,37 @@ const Dashboard = () => {
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-64 bg-white h-screen shadow-sm">
+        <div className={`bg-white h-screen shadow-sm transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-16'}`}>
           <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              {sidebarOpen && <span className="text-lg font-semibold text-gray-800">Menu</span>}
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+              >
+                {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
             <nav className="space-y-2">
               <a href="#" className="flex items-center space-x-3 text-blue-600 bg-blue-50 px-3 py-2 rounded-lg font-medium">
                 <LayoutDashboard className="h-5 w-5" />
-                <span>Dashboard</span>
+                {sidebarOpen && <span>Dashboard</span>}
               </a>
               <a href="#" className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg">
                 <Users className="h-5 w-5" />
-                <span>My Groups</span>
+                {sidebarOpen && <span>My Groups</span>}
               </a>
               <a href="#" className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg">
                 <Plus className="h-5 w-5" />
-                <span>Add Expense</span>
+                {sidebarOpen && <span>Add Expense</span>}
               </a>
               <a href="#" className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg">
                 <Receipt className="h-5 w-5" />
-                <span>Settlements</span>
+                {sidebarOpen && <span>Settlements</span>}
               </a>
               <a href="#" className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg">
                 <BarChart3 className="h-5 w-5" />
-                <span>Reports</span>
+                {sidebarOpen && <span>Reports</span>}
               </a>
             </nav>
           </div>
@@ -193,7 +195,7 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Manager Dashboard</h1>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -218,9 +220,10 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">Groups Overview</h2>
                 <div className="flex items-center space-x-3">
-                  <button 
+                  <button
                     onClick={() => {
                       console.log('Create Group button clicked');
+                      setEditGroup(null);
                       setShowModal(true);
                     }}
                     className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-600 transition-colors"
@@ -237,24 +240,15 @@ const Dashboard = () => {
             </div>
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Create New Group Box */}
-                <div
-                  onClick={() => {
-                    setShowModal(true);
-                  }}
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors min-h-[120px]"
-                >
-                  <Plus className="h-8 w-8 text-gray-400 mb-2" />
-                  <h3 className="font-semibold text-gray-700">Create a New Group</h3>
-                  <p className="text-sm text-gray-500 text-center mt-1">Start organizing expenses with friends or colleagues</p>
-                </div>
-
-                {groups.map((group, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                {groups.map((group) => (
+                  <div key={group.id} className="border border-gray-200 rounded-lg p-4 relative">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-gray-900">{group.name}</h3>
                       <span className="text-sm text-gray-500">{group.members} members</span>
                     </div>
+                    {group.description && (
+                      <p className="text-sm text-gray-600 mb-3 italic">{group.description}</p>
+                    )}
                     <p className="text-sm text-gray-600 mb-3">Your balance:</p>
                     {group.status === 'owed' && (
                       <p className="text-green-600 font-semibold">You are owed ${group.balance.toFixed(2)}</p>
@@ -276,6 +270,18 @@ const Dashboard = () => {
                         ></div>
                       </div>
                     </div>
+                    <button
+                      onClick={() => {
+                        setEditGroup(group);
+                        setShowModal(true);
+                      }}
+                      className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                      title="Edit Group"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -314,13 +320,24 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <CreateGroupModal 
-            isOpen={showModal} 
-            onClose={() => setShowModal(false)} 
-            onSave={(data) => { 
-              console.log('Group saved:', data); 
-              setShowModal(false); 
-            }} 
+          <CreateGroupModal
+            isOpen={showModal}
+            onClose={() => {
+              setShowModal(false);
+              setEditGroup(null);
+            }}
+            onSave={(data) => {
+              console.log('Group created:', data);
+              // Don't close; modal switches to edit mode internally
+              // Optionally refresh groups list here (mock for now)
+            }}
+            editGroup={editGroup}
+            onUpdate={(updatedGroup) => {
+              console.log('Group updated:', updatedGroup);
+              // Optionally refresh groups list
+              setShowModal(false);
+              setEditGroup(null);
+            }}
           />
         </div>
       </div>
@@ -343,4 +360,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ManagerDashboard
